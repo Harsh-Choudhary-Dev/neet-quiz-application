@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEET Biology Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #8B5CF6;
+            --success: #10B981;
+            --error: #EF4444;
+            --background: #F8FAFF;
+            --surface: #FFFFFF;
+            --text-primary: #1F2937;
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            font-family: 'Dosis', sans-serif;
+            margin: 0;
+        }
+
+        .quiz-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1rem;
+        }
+
+        .question-container {
+            margin: 1.5rem 0;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            line-height: 1.4;
+            margin: 0 0 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .option {
+            background: var(--surface);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .option.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .option.correct {
+            background: var(--success);
+            color: white;
+        }
+
+        .option.wrong {
+            background: var(--error);
+            color: white;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            margin: 1rem auto 0;
+        }
+
+        .report-btn {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .quiz-card {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            .option {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .timer {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .submit-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Responsive adjustments for larger screens */
+        @media (min-width: 769px) {
+            .quiz-card {
+                padding: 2.5rem;  /* Increased padding for larger screens */
+                margin: 2rem auto; /* Centered margin for larger screens */
+                width: 80%;        /* Set width to 80% for better fit */
+            }
+
+            .question-number {
+                font-size: 1.5rem; /* Increased font size for question number */
+            }
+
+            .question-container h2 {
+                font-size: 1.8rem; /* Increased font size for question text */
+                line-height: 1.5;  /* Improved line height for readability */
+            }
+
+            .options-grid {
+                gap: 1rem;         /* Increased gap between options */
+            }
+
+            .option {
+                padding: 1.2rem;   /* Increased padding for options */
+                font-size: 1.1rem; /* Increased font size for options */
+            }
+
+            .timer {
+                font-size: 1.2rem; /* Increased font size for timer */
+            }
+
+            .submit-btn, .report-btn {
+                padding: 1rem 2rem; /* Increased padding for buttons */
+                font-size: 1.1rem;   /* Increased font size for buttons */
+            }
+        }
+
+ 
+
+
+
+    </style>
+</head>
+<body>
+    <div class="quiz-card">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+        </div>
+
+        <div class="timer">
+            <i class="fas fa-clock"></i>
+            <span id="timer">30s</span>
+        </div>
+
+        <div id="question-number" class="question-number"></div>
+
+        <div class="question-container">
+            <h2 id="question-text"></h2>
+            <div class="options-grid" id="options-container"></div>
+            <div id="result"></div>
+        </div>
+
+        <button class="submit-btn" id="next-btn">
+            Next Question
+            <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <button class="report-btn" id="report-btn">
+            <i class="fas fa-exclamation-circle"></i>
+            Report
+        </button>
+    </div>
+
+    <script>
+        let startTime;
+        let quest;
+        const studentResponsesList = [];
+        const chapter_name = localStorage.getItem('selectedChapter');
+        const student_id = sessionStorage.getItem("student_id");
+        let endTime;
+        let currentQuestion = 0;
+        let score = 0;
+        let timer;
+
+        async function getData(url, method) {
+            try {
+                const quizConfiq = localStorage.getItem("quizConfiq")
+                console.log(quizConfiq)
+                let body;
+                
+                if (quizConfiq) {
+                    let parsedData = JSON.parse(quizConfiq);
+
+                    // Change all "question_number":"30" to "2" in one pass
+                    function updateQuestionNumber(obj) {
+                        if (Array.isArray(obj)) {
+                            return obj.map(updateQuestionNumber);
+                        } else if (obj && typeof obj === 'object') {
+                            if (obj.question_number === "30") obj.question_number = "2";
+                            if (obj.chapters) obj.chapters = updateQuestionNumber(obj.chapters);
+                            return obj;
+                        }
+                        return obj;
+                    }
+
+                    parsedData = updateQuestionNumber(parsedData);
+                    body = JSON.stringify(parsedData.chapters ? parsedData.chapters : parsedData);
+                }
+                console.log(body)
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-API-KEY': 'neet_QdrUprUid6I7h7HTvdfOJHib0aSNOy7iUyLYYdFaPcc',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    ...(body ? { body } : {})
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error(error.message);
+                displayErrorMessage("Error loading quiz. Please try again.");
+            }
+        }
+
+        function loadQuestion(questions) {
+            if (!questions || !questions.length) {
+                displayErrorMessage("No questions available");
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            document.getElementById("question-number").textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById("question-text").textContent = question.question;
+
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+
+            [question.option1, question.option2, question.option3, question.option4].forEach((option, index) => {
+                const button = document.createElement("button");
+                button.classList.add("option");
+                button.textContent = option;
+                button.addEventListener("click", () => selectOption(index, questions));
+                optionsContainer.appendChild(button);
+            });
+
+            document.getElementById("next-btn").style.display = "none";
+            document.getElementById("result").textContent = "";
+            
+            startTimer(questions);
+        }
+
+        function selectOption(index, questions) {
+            clearInterval(timer);
+            const options = document.querySelectorAll(".option");
+            const correctIndex = questions[currentQuestion]['correct-ans'];
+
+            options.forEach(option => {
+                option.classList.remove("selected");
+                option.disabled = true;
+            });
+
+            options[index].classList.add("selected");
+
+            const response = {
+                student_id: student_id,
+                ch_id: questions[currentQuestion]["chapter_id"],
+                question_id: questions[currentQuestion].id,
+                selected_ans: index + 1
+            };
+            studentResponsesList.push(response);
+
+            setTimeout(() => {
+                if ((index + 1) === parseInt(correctIndex)) {
+                    options[index].classList.add("correct");
+                    console.log(index,correctIndex)
+                    score++;
+                } else {
+                    options[index].classList.add("wrong");
+                    options[correctIndex - 1]?.classList.add("correct");
+                    console.log(index,correctIndex)
+                }
+
+                const progress = ((currentQuestion + 1) / questions.length) * 100;
+                document.querySelector(".progress-fill").style.width = `${progress}%`;
+                document.getElementById("next-btn").style.display = "flex";
+            }, 300);
+        }
+
+        function nextQuestion(questions) {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion(questions);
+                const reportBtn = document.getElementById("report-btn");
+                reportBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Report';
+                reportBtn.disabled = false;
+            } else {
+                endTime = Date.now();
+                document.getElementById("next-btn").innerText = "Submit";
+                console.log(studentResponsesList)
+                validate_answer(studentResponsesList);
+            }
+        }
+
+        function startTimer(questions) {
+            let timeLeft = 30;
+            const timerElement = document.getElementById("timer");
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `${timeLeft}s`;
+                if (timeLeft === 0) {
+                    clearInterval(timer);
+                    nextQuestion(questions);
+                }
+            }, 1000);
+        }
+
+        function displayErrorMessage(message) {
+            const errorContainer = document.createElement("div");
+            errorContainer.className = "error-message";
+            errorContainer.textContent = message;
+            document.body.appendChild(errorContainer);
+
+            setTimeout(() => errorContainer.remove(), 3000);
+        }
+
+        const quiz_type = localStorage.getItem("quiz_type");
+        const url = quiz_type === "performance-based" ? `/api/v1/performance-based-mock?student_id=${student_id}` :
+                   quiz_type === "custom-topic" ? "/api/v1/random/chapter-ids" :
+                   quiz_type === "custom-mix" ? "/api/v1/custom-mix/chapter-ids" :
+                   "/api/v1/random-mix";
+        const method = ["custom-topic", "custom-mix"].includes(quiz_type) ? "POST" : "GET";
+
+        getData(url, method).then(questions => {
+            if (questions) {
+                startTime = Date.now();
+                quest = questions.data;
+                loadQuestion(questions.data);
+                document.getElementById("next-btn").addEventListener("click", () => nextQuestion(questions.data));
+            }
+        });
+
+        function validate_answer(submissionData) {
+            // console.log(submissionData)
+            fetch('/api/v1/validate-answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'neet_QdrUprUid6I7h7HTvdfOJHib0aSNOy7iUyLYYdFaPcc'
+                },
+                body: JSON.stringify(submissionData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                localStorage.setItem("chapterwise_analytics",JSON.stringify(data))
+                const time_taken = (endTime - startTime) / 1000;
+                const formatted_json = transformQuizData(data, time_taken);
+                console.log(formatted_json)
+                storeResult(formatted_json);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayErrorMessage("Error submitting answers");
+            });
+        }
+
+        function transformQuizData(inputData, time_taken) {
+            return {
+                student_id: inputData.student_id,
+                score: inputData["score(%)"],
+                total_marks: inputData.total_marks,
+                total_questions: inputData.total_questions,
+                quiz_type: localStorage.getItem("quiz_type"),
+                time_taken: time_taken,
+                chapter_ids: Object.keys(inputData.chapterwise_total_question).join(',')
+            };
+        }
+
+        function storeResult(submissionData) {
+            fetch('/api/v1/quiz-details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'neet_QdrUprUid6I7h7HTvdfOJHib0aSNOy7iUyLYYdFaPcc'
+                },
+                body: JSON.stringify(submissionData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log(data)
+                console.log(submissionData)
+                localStorage.setItem("quiz_id", data["quiz_id"]);
+                window.location.href = "result.html";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayErrorMessage("Error saving results");
+            });
+        }
+
+        document.getElementById("report-btn").addEventListener("click", function() {
+            if (quest && quest[currentQuestion]) {
+                const submissionData = [{
+                    source_table: quest[currentQuestion].chapter_id,
+                    question_id: quest[currentQuestion].id,
+                    student_id: sessionStorage.getItem("student_id"),
+                    status: "Pending"
+                }];
+                
+                const reportBtn = document.getElementById("report-btn");
+                reportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reporting...';
+                reportBtn.disabled = true;
+
+                fetch('/api/v1/report-questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': 'neet_QdrUprUid6I7h7HTvdfOJHib0aSNOy7iUyLYYdFaPcc'
+                    },
+                    body: JSON.stringify(submissionData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    reportBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Success';
+                    reportBtn.disabled = true;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    displayErrorMessage("Error reporting question");
+                    reportBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Report';
+                    reportBtn.disabled = false;
+                });
+            }
+        });
+
+        console.log("hello from harsh")
+    </script>
+</body>
+</html>
